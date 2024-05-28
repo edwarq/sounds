@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta Atrás con Música de Ascensor</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa; /* Color de fondo suave */
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .timer {
+            text-align: center;
+            color: #343a40; /* Color del texto principal */
+            height: calc(100vh - 180px); /* Calculamos el alto para centrar verticalmente, ajustado para dejar espacio al botón */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .time {
+            font-size: 72px; /* Tamaño de fuente grande */
+            margin-bottom: 20px;
+        }
+        .instructions {
+            font-size: 24px;
+            color: #6c757d; /* Color del texto secundario */
+            margin-bottom: 20px;
+        }
+        .button-container {
+            align-self: flex-end;
+            margin-bottom: 20px;
+            position: sticky; /* Fijar el contenedor del botón */
+            bottom: 20px; /* Espacio desde el borde inferior */
+            z-index: 1; /* Asegurar que el botón esté por encima del contenido */
+        }
+        button {
+            padding: 0;
+            cursor: pointer;
+            background-color: #007bff; /* Color de fondo del botón */
+            color: white; /* Color del texto del botón */
+            border: none;
+            border-radius: 50%; /* Hacer el botón redondo */
+            width: 50px; /* Ancho del botón */
+            height: 50px; /* Altura del botón */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            margin-right: 10px; /* Espacio entre botones */
+        }
+        button:hover {
+            background-color: #0056b3; /* Cambio de color al pasar el cursor */
+        }
+        .speaker-icon {
+            width: 30px; /* Tamaño del icono de bocina */
+            height: auto;
+            fill: white; /* Color del icono de bocina */
+        }
+        audio {
+            display: none; /* Ocultar el reproductor de audio */
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timerContainer">
+        <div class="time" id="time">05:00</div>
+        <div class="instructions">Esperando el inicio de la capacitación...</div>
+    </div>
+    <div class="button-container">
+        <button id="toggleSoundButton" onclick="toggleSound()">
+            <svg class="speaker-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 9v6h4l5 5V4l-5 5H7z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+        </button>
+        <button id="playPauseButton" onclick="togglePlayPause()">
+            <svg class="speaker-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path id="playIcon" d="M8 5v14l11-7z"/>
+                <path id="pauseIcon" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                <path d="M0 0h24v24H0z" fill="none"/>
+            </svg>
+        </button>
+    </div>
+    <audio id="backgroundMusic" loop>
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+    <script>
+        let countdown = 300;
+        let soundEnabled = true;
+        let musicPlaying = false;
+        let timerInterval;
+        const timeElement = document.getElementById('time');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+
+        function updateTimer() {
+            const minutes = Math.floor(countdown / 60);
+            const seconds = countdown % 60;
+            timeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (countdown > 0) {
+                countdown--;
+            } else {
+                clearInterval(timerInterval);
+                timeElement.textContent = "¡Es hora de comenzar!";
+            }
+        }
+
+        function toggleSound() {
+            if (soundEnabled) {
+                backgroundMusic.pause();
+                soundEnabled = false;
+            } else {
+                backgroundMusic.play();
+                soundEnabled = true;
+            }
+        }
+
+        function togglePlayPause() {
+            if (!musicPlaying) {
+                if (!timerInterval) {
+                    timerInterval = setInterval(updateTimer, 1000);
+                }
+                musicPlaying = true;
+                backgroundMusic.play();
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            } else {
+                musicPlaying = false;
+                clearInterval(timerInterval);
+                backgroundMusic.pause();
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            }
+        }
+
+        window.onload = function() {
+            const audio = document.getElementById('backgroundMusic');
+            audio.src = 'https://github.com/edwarq/sounds/raw/main/coffee-break-3118_5min.mp3';
+            audio.play().catch(error => console.error('Error al reproducir el audio:', error));
+        };
+    </script>
+</body>
+</html>
